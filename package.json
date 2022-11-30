@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "allows the editing and creation of simple gifs",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,11 +18,9 @@
     "url": "https://github.com/Luke-G-Cordova/gif-editor/issues"
   },
   "homepage": "https://github.com/Luke-G-Cordova/gif-editor#readme",
-  "devDependencies": {
-    "typescript": "^4.9.3"
-  },
   "dependencies": {
     "canvas": "^2.10.2",
-    "gif-encoder-2": "^1.0.5"
+    "gif-encoder-2": "^1.0.5",
+    "stream": "^0.0.2"
   }
 }
