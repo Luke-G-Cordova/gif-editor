@@ -41,6 +41,6 @@ encoder.finish();
 
 const buffer = encoder.out.getData();
 
-writeFile('example.gif', buffer, (error) => {
+writeFile('media/example.gif', buffer, (error) => {
   console.log(error);
 });
