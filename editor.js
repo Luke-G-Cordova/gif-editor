@@ -72,6 +72,7 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
 };
 
 const moveGrid = (e) => {
+  document.body.style.cursor = 'grabbing';
   let ogX = e.clientX;
   let ogY = e.clientY;
   window.onmousemove = (ev) => {
@@ -104,6 +105,7 @@ const moveGrid = (e) => {
     ogY = newY;
   };
   window.onmouseup = () => {
+    document.body.style.cursor = 'grab';
     window.onmousemove = null;
     window.onmouseup = null;
   };
@@ -214,15 +216,18 @@ const nullifyUsedEventListeners = () => {
 const setTool = (tool) => {
   switch (tool) {
     case 'move':
+      document.body.style.cursor = 'grab';
       nullifyUsedEventListeners();
       window.onmousedown = moveGrid;
       break;
     case 'paint':
+      document.body.style.cursor = 'auto';
       currentPaintColor = 'black';
       nullifyUsedEventListeners();
       window.onmousedown = paintOnGrid;
       break;
     case 'erase':
+      document.body.style.cursor = 'auto';
       nullifyUsedEventListeners();
       currentPaintColor = 0;
       window.onmousedown = paintOnGrid;
