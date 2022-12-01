@@ -144,6 +144,7 @@ window.onwheel = (e) => {
   } else if (cellSize >= 200) {
     cellSize = 200;
   }
+  console.log(cellSize);
   amtVisibleSquaresToCenter = Math.round(canvasSize / cellSize / 2);
 
   if (gridX - amtVisibleSquaresToCenter < 0) {
