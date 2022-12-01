@@ -17,7 +17,7 @@ toolButtons.forEach((tool) => {
 ctx.lineWidth = 0.3;
 const canvasSize = canvas.clientWidth;
 let gridSize = 1000;
-let cellSize = 6;
+let cellSize = 15;
 let amtVisibleSquaresToCenterW = canvas.clientWidth / cellSize / 2;
 let amtVisibleSquaresToCenterH = canvas.clientHeight / cellSize / 2;
 let gridX = gridSize / 2;
@@ -218,6 +218,7 @@ const setTool = (tool) => {
       window.onmousedown = moveGrid;
       break;
     case 'paint':
+      currentPaintColor = 'black';
       nullifyUsedEventListeners();
       window.onmousedown = paintOnGrid;
       break;
@@ -231,7 +232,7 @@ const setTool = (tool) => {
 
 setInterval(() => {
   clearGrid();
-  drawGrid(gridX, gridY, cellSize >= 6);
+  drawGrid(gridX, gridY, cellSize >= 15);
 }, 1);
 
 setTool('paint');
