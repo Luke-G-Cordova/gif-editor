@@ -8,7 +8,7 @@ let [canvasX, canvasY] = [
 const ctx = canvas.getContext('2d');
 ctx.lineWidth = 0.3;
 const canvasSize = canvas.clientWidth;
-let gridSize = 1000;
+let gridSize = 200;
 let cellSize = 8;
 const amtVisibleSquaresToCenter = canvasSize / cellSize / 2;
 let gridX = gridSize / 2;
@@ -19,11 +19,7 @@ let gridPosX, gridPosY;
 for (let i = 0; i < gridSize; i++) {
   grid.push([]);
   for (let j = 0; j < gridSize; j++) {
-    if ((j + i) % 2 == 0) {
-      grid[i].push(0);
-    } else {
-      grid[i].push(1);
-    }
+    grid[i].push(0);
   }
 }
 const clearGrid = () => {
@@ -49,7 +45,10 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
 
         // ctx.fillStyle = grid[i][j] === 0 ? 'black' : 'yellow';
         // ctx.fillRect(x, y, cellSize, cellSize);
-
+        if (grid[i][j] != 0) {
+          ctx.fillStyle = grid[i][j];
+          ctx.fillRect(x, y, cellSize, cellSize);
+        }
         if (gridLines) {
           ctx.beginPath();
           ctx.moveTo(x + cellSize, y);
@@ -89,8 +88,37 @@ const moveGrid = (e) => {
     ) {
       gridY += (newY - ogY) / cellSize;
     }
-    clearGrid();
-    drawGrid(gridX, gridY, true);
+    ogX = newX;
+    ogY = newY;
+  };
+  window.onmouseup = () => {
+    window.onmousemove = null;
+    window.onmouseup = null;
+  };
+};
+
+const paintOnGrid = (e) => {
+  let ogX = e.clientX;
+  let ogY = e.clientY;
+  let i = Math.floor(
+    gridX - amtVisibleSquaresToCenter + (ogX - canvasX - 1) / cellSize
+  );
+  let j = Math.floor(
+    gridY - amtVisibleSquaresToCenter + (ogY - canvasY - 1) / cellSize
+  );
+  grid[i][j] = 'black';
+  window.onmousemove = (ev) => {
+    let newX = ev.clientX;
+    let newY = ev.clientY;
+
+    i = Math.floor(
+      gridX - amtVisibleSquaresToCenter + (newX - canvasX - 1) / cellSize
+    );
+    j = Math.floor(
+      gridY - amtVisibleSquaresToCenter + (newY - canvasY - 1) / cellSize
+    );
+    grid[i][j] = 'black';
+
     ogX = newX;
     ogY = newY;
   };
@@ -111,8 +139,18 @@ const setTool = (tool) => {
     case 'move':
       nullifyUsedEventListeners();
       window.onmousedown = moveGrid;
+      break;
+    case 'paint':
+      nullifyUsedEventListeners();
+      window.onmousedown = paintOnGrid;
+      break;
   }
 };
 
-drawGrid(gridSize / 2, gridSize / 2, true);
-setTool('move');
+setInterval(() => {
+  clearGrid();
+  drawGrid(gridX, gridY, true);
+}, 1);
+
+// drawGrid(gridSize / 2, gridSize / 2, true);
+setTool('paint');
