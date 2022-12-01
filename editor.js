@@ -9,8 +9,8 @@ const ctx = canvas.getContext('2d');
 ctx.lineWidth = 0.3;
 const canvasSize = canvas.clientWidth;
 let gridSize = 200;
-let cellSize = 8;
-const amtVisibleSquaresToCenter = canvasSize / cellSize / 2;
+let cellSize = 4;
+let amtVisibleSquaresToCenter = canvasSize / cellSize / 2;
 let gridX = gridSize / 2;
 let gridY = gridSize / 2;
 const grid = [];
@@ -60,12 +60,6 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
       }
     }
   }
-};
-
-window.onresize = (e) => {
-  const canvasRect = canvas.getBoundingClientRect();
-  canvasX = canvasRect.x;
-  canvasY = canvasRect.y;
 };
 
 const moveGrid = (e) => {
@@ -128,6 +122,43 @@ const paintOnGrid = (e) => {
   };
 };
 
+// update coordinates of canvas on resize
+window.onresize = (e) => {
+  const canvasRect = canvas.getBoundingClientRect();
+  canvasX = canvasRect.x;
+  canvasY = canvasRect.y;
+};
+
+// update cell size to control zoom level
+window.onwheel = (e) => {
+  const scrollDirection = Math.sign(e.deltaY);
+  const amtScroll =
+    cellSize <= 10 ? 32 : cellSize < 20 ? 8 : cellSize < 50 ? 4 : 2;
+  if (scrollDirection < 0) {
+    cellSize = canvasSize / (amtVisibleSquaresToCenter * 2 - amtScroll);
+  } else {
+    cellSize = canvasSize / (amtVisibleSquaresToCenter * 2 + amtScroll);
+  }
+  if (cellSize < 4) {
+    cellSize = 4;
+  } else if (cellSize >= 200) {
+    cellSize = 200;
+  }
+  amtVisibleSquaresToCenter = Math.round(canvasSize / cellSize / 2);
+
+  if (gridX - amtVisibleSquaresToCenter < 0) {
+    gridX = 0 + amtVisibleSquaresToCenter;
+  } else if (gridX + amtVisibleSquaresToCenter >= gridSize) {
+    gridX = gridSize - amtVisibleSquaresToCenter;
+  }
+
+  if (gridY - amtVisibleSquaresToCenter < 0) {
+    gridY = 0 + amtVisibleSquaresToCenter;
+  } else if (gridY + amtVisibleSquaresToCenter >= gridSize) {
+    gridY = gridSize - amtVisibleSquaresToCenter;
+  }
+};
+
 const nullifyUsedEventListeners = () => {
   window.onmousedown = null;
   window.onmousemove = null;
@@ -152,5 +183,4 @@ setInterval(() => {
   drawGrid(gridX, gridY, true);
 }, 1);
 
-// drawGrid(gridSize / 2, gridSize / 2, true);
-setTool('paint');
+setTool('move');
