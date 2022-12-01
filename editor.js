@@ -6,10 +6,18 @@ let [canvasX, canvasY] = [
   canvas.getBoundingClientRect().y,
 ];
 const ctx = canvas.getContext('2d');
+const toolButtons = document.querySelectorAll('input.toolButton');
+toolButtons.forEach((tool) => {
+  tool.onchange = () => {
+    if (tool.checked) {
+      setTool(tool.dataset.tn);
+    }
+  };
+});
 ctx.lineWidth = 0.3;
 const canvasSize = canvas.clientWidth;
-let gridSize = 200;
-let cellSize = 4;
+let gridSize = 1000;
+let cellSize = 6;
 let amtVisibleSquaresToCenter = canvasSize / cellSize / 2;
 let gridX = gridSize / 2;
 let gridY = gridSize / 2;
@@ -139,11 +147,12 @@ window.onwheel = (e) => {
   } else {
     cellSize = canvasSize / (amtVisibleSquaresToCenter * 2 + amtScroll);
   }
-  if (cellSize < 4) {
-    cellSize = 4;
+  if (cellSize < canvasSize / gridSize) {
+    cellSize = canvasSize / gridSize;
   } else if (cellSize >= 200) {
     cellSize = 200;
   }
+
   amtVisibleSquaresToCenter = Math.round(canvasSize / cellSize / 2);
 
   if (gridX - amtVisibleSquaresToCenter < 0) {
@@ -180,7 +189,7 @@ const setTool = (tool) => {
 
 setInterval(() => {
   clearGrid();
-  drawGrid(gridX, gridY, true);
+  drawGrid(gridX, gridY, cellSize >= 6);
 }, 1);
 
 setTool('move');
