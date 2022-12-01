@@ -7,18 +7,18 @@ body {
 }
 
 div.canvasWrapper {
-  padding-top: 80px;
+  /* padding-top: 80px; */
   display: flex;
   justify-content: center;
   align-items: center;
   width: 100vw;
-  height: 92vh;
+  height: 100vh;
 }
 
 div.toolbar {
   position: absolute;
-  top: -65px;
-  left: 0;
+  top: 65px;
+  left: 65px;
   border-radius: 30px;
   background-color: rgb(57, 154, 233);
   height: 60px;
@@ -75,6 +75,6 @@ div.toolWrapper > label > input:checked + div {
 }
 canvas#myCanvas {
   border: 1px solid black;
-  width: 800px;
-  height: 800px;
+  width: 100vw;
+  height: 100vh;
 }
