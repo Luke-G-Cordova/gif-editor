@@ -65,6 +65,9 @@ div.toolWrapper > label > input {
   height: 33px;
   background-color: rgba(0, 0, 0, 0);
   border: none;
+}
+
+div.toolWrapper > label > input[type='radio'] {
   opacity: 0;
 }
 div.toolWrapper > label > input:checked + div {
