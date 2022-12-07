@@ -9,11 +9,17 @@ const ctx = canvas.getContext('2d');
 const toolbar = document.querySelector('div.toolbar');
 const toolButtons = document.querySelectorAll('input.toolButton');
 toolButtons.forEach((tool) => {
-  tool.onchange = () => {
-    if (tool.checked) {
-      setTool(tool.dataset.tn);
-    }
-  };
+  if (tool.type === 'radio') {
+    tool.onchange = () => {
+      if (tool.checked) {
+        setTool(tool.dataset.tn);
+      }
+    };
+  } else {
+    tool.oninput = () => {
+      setTool(tool.value);
+    };
+  }
 });
 ctx.lineWidth = 0.3;
 const canvasSize = canvas.clientWidth;
@@ -26,6 +32,7 @@ let gridY = gridSize / 2;
 const grid = [];
 let gridPosX, gridPosY;
 let currentPaintColor = 'black';
+let savePaintColor = 'black';
 
 for (let i = 0; i < gridSize; i++) {
   grid.push([]);
@@ -223,7 +230,7 @@ const setTool = (tool) => {
       break;
     case 'paint':
       document.body.style.cursor = 'auto';
-      currentPaintColor = 'black';
+      currentPaintColor = savePaintColor;
       nullifyUsedEventListeners();
       window.onmousedown = paintOnGrid;
 
@@ -247,6 +254,10 @@ const setTool = (tool) => {
           window.onmouseup = null;
         };
       };
+      break;
+    default:
+      savePaintColor = tool;
+      setTool('paint');
       break;
   }
 };
