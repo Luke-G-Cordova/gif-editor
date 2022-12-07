@@ -220,6 +220,14 @@ const setTool = (tool) => {
       document.body.style.cursor = 'grab';
       nullifyUsedEventListeners();
       window.onmousedown = moveGrid;
+
+      toolbar.onmousedown = () => {
+        window.onmousedown = null;
+        window.onmouseup = () => {
+          window.onmousedown = moveGrid;
+          window.onmouseup = null;
+        };
+      };
       break;
     case 'paint':
       document.body.style.cursor = 'auto';
