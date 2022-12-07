@@ -6,6 +6,7 @@ let [canvasX, canvasY] = [
   canvas.getBoundingClientRect().y,
 ];
 const ctx = canvas.getContext('2d');
+const toolbar = document.querySelector('div.toolbar');
 const toolButtons = document.querySelectorAll('input.toolButton');
 toolButtons.forEach((tool) => {
   tool.onchange = () => {
@@ -225,12 +226,27 @@ const setTool = (tool) => {
       currentPaintColor = 'black';
       nullifyUsedEventListeners();
       window.onmousedown = paintOnGrid;
+
+      toolbar.onmousedown = () => {
+        window.onmousedown = null;
+        window.onmouseup = () => {
+          window.onmousedown = paintOnGrid;
+          window.onmouseup = null;
+        };
+      };
       break;
     case 'erase':
       document.body.style.cursor = 'auto';
       nullifyUsedEventListeners();
       currentPaintColor = 0;
       window.onmousedown = paintOnGrid;
+      toolbar.onmousedown = () => {
+        window.onmousedown = null;
+        window.onmouseup = () => {
+          window.onmousedown = paintOnGrid;
+          window.onmouseup = null;
+        };
+      };
       break;
   }
 };
