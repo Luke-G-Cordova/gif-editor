@@ -32,6 +32,15 @@ div.toolbar {
   box-sizing: border-box;
 }
 
+div.snipBox {
+  display: none;
+  border: 2px dashed rgba(0, 0, 0, 1);
+  border-radius: 6px;
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  user-select: none;
+}
 /* div.toolbar > a {
 } */
 div.toolWrapper {

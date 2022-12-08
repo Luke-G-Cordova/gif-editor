@@ -31,7 +31,6 @@ toolButtons.forEach((tool) => {
   }
 });
 ctx.lineWidth = 0.3;
-const canvasSize = canvas.clientWidth;
 let gridSize = 1000;
 let cellSize = 15;
 let amtVisibleSquaresToCenterW = canvas.clientWidth / cellSize / 2;
@@ -128,6 +127,38 @@ const moveGrid = (e) => {
   };
 };
 
+const snip = (e) => {
+  let box = document.querySelector('div.snipBox');
+  box.style.display = 'block';
+
+  box.style.left = e.clientX + 'px';
+  box.style.top = e.clientY + 'px';
+
+  let ogX = e.clientX;
+  let ogY = e.clientY;
+
+  // let xOnCanvas = ogX - canvasX;
+  // let yOnCanvas = ogY - canvasY;
+  window.onmousemove = (ev) => {
+    let bW = ev.clientX - ogX;
+    let bH = ev.clientY - ogY;
+    box.style.width = Math.abs(bW) + 'px';
+    box.style.height = Math.abs(bH) + 'px';
+    if (bW < 0) {
+      box.style.left = ev.clientX + 'px';
+    }
+    if (bH < 0) {
+      box.style.top = ev.clientY + 'px';
+    }
+  };
+  window.onmouseup = (ev) => {
+    window.onmousemove = null;
+    window.onmouseup = null;
+    box.style.display = 'none';
+    box.style.width = '0px';
+    box.style.height = '0px';
+  };
+};
 const paintOnGrid = (e) => {
   let ogX = e.clientX;
   let ogY = e.clientY;
@@ -167,9 +198,9 @@ const paintOnGrid = (e) => {
         gridY - amtVisibleSquaresToCenterH + (newY - canvasY - 1) / cellSize
       );
       grid[i][j] = currentPaintColor;
-      if (Math.abs(ogI - i) > 1 || Math.abs(ogJ - j) > 1) {
-        drawLine(ogI, ogJ, i, j);
-      }
+      // if (Math.abs(ogI - i) > 1 || Math.abs(ogJ - j) > 1) {
+      drawLine(ogI, ogJ, i, j);
+      // }
       ogI = i;
       ogJ = j;
     }
@@ -309,6 +340,17 @@ const setTool = (tool) => {
         };
       };
       break;
+    case 'snip':
+      nullifyUsedEventListeners();
+      window.onmousedown = snip;
+      toolbar.onmousedown = () => {
+        window.onmousedown = null;
+        window.onmouseup = () => {
+          window.onmousedown = snip;
+          window.onmouseup = null;
+        };
+      };
+      break;
     default:
       savePaintColor = tool;
       setTool('paint');
@@ -316,7 +358,7 @@ const setTool = (tool) => {
   }
 };
 
-setInterval(() => {
+let DRAW_GRID = setInterval(() => {
   clearGrid();
   drawGrid(gridX, gridY, cellSize >= 15 && gridLines);
 }, 1);
