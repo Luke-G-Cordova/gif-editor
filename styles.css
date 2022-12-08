@@ -41,6 +41,9 @@ div.snipBox {
   left: 20px;
   user-select: none;
 }
+div.snipBox:hover {
+  cursor: grab;
+}
 /* div.toolbar > a {
 } */
 div.toolWrapper {

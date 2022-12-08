@@ -127,9 +127,28 @@ const moveGrid = (e) => {
   };
 };
 
+const select = (e) => {
+  e.path[0].style.cursor = 'grabbing';
+
+  window.onmousemove = (ev) => {
+    let right = e.path[0].offsetLeft + e.path[0].offsetWidth;
+    let bottom = e.path[0].offsetTop + e.path[0].offsetHeight;
+
+    e.path[0].style.top = ev.clientY - (bottom - ev.clientY) + 'px';
+    e.path[0].style.left = ev.clientX - (right - ev.clientX) + 'px';
+  };
+  e.path[0].onmouseup = (ev) => {
+    window.onmousemove = null;
+    e.path[0].onmouseup = null;
+    e.path[0].style.cursor = 'grab';
+  };
+};
+
 const snip = (e) => {
   let box = document.querySelector('div.snipBox');
   box.style.display = 'block';
+  box.style.width = 0;
+  box.style.height = 0;
 
   box.style.left = e.clientX + 'px';
   box.style.top = e.clientY + 'px';
@@ -154,9 +173,13 @@ const snip = (e) => {
   window.onmouseup = (ev) => {
     window.onmousemove = null;
     window.onmouseup = null;
-    box.style.display = 'none';
-    box.style.width = '0px';
-    box.style.height = '0px';
+    if (box.offsetWidth < cellSize || box.offsetHeight < cellSize) {
+      box.style.display = 'none';
+      box.style.width = '0px';
+      box.style.height = '0px';
+    } else {
+      setTool('select');
+    }
   };
 };
 const paintOnGrid = (e) => {
@@ -343,6 +366,18 @@ const setTool = (tool) => {
     case 'snip':
       nullifyUsedEventListeners();
       window.onmousedown = snip;
+      toolbar.onmousedown = () => {
+        window.onmousedown = null;
+        window.onmouseup = () => {
+          window.onmousedown = snip;
+          window.onmouseup = null;
+        };
+      };
+      break;
+    case 'select':
+      nullifyUsedEventListeners();
+      let box = document.querySelector('div.snipBox');
+      box.onmousedown = select;
       toolbar.onmousedown = () => {
         window.onmousedown = null;
         window.onmouseup = () => {
