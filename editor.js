@@ -133,19 +133,20 @@ const paintOnGrid = (e) => {
   let ogY = e.clientY;
   let xOnCanvas = ogX - canvasX;
   let yOnCanvas = ogY - canvasY;
+  let ogI, ogJ;
   if (
     xOnCanvas > 0 &&
     xOnCanvas < canvas.clientWidth &&
     yOnCanvas > 0 &&
     yOnCanvas < canvas.clientHeight
   ) {
-    let i = Math.floor(
+    ogI = Math.floor(
       gridX - amtVisibleSquaresToCenterW + (ogX - canvasX - 1) / cellSize
     );
-    let j = Math.floor(
+    ogJ = Math.floor(
       gridY - amtVisibleSquaresToCenterH + (ogY - canvasY - 1) / cellSize
     );
-    grid[i][j] = currentPaintColor;
+    grid[ogI][ogJ] = currentPaintColor;
   }
   window.onmousemove = (ev) => {
     let newX = ev.clientX;
@@ -166,6 +167,11 @@ const paintOnGrid = (e) => {
         gridY - amtVisibleSquaresToCenterH + (newY - canvasY - 1) / cellSize
       );
       grid[i][j] = currentPaintColor;
+      if (Math.abs(ogI - i) > 1 || Math.abs(ogJ - j) > 1) {
+        drawLine(ogI, ogJ, i, j);
+      }
+      ogI = i;
+      ogJ = j;
     }
     ogX = newX;
     ogY = newY;
@@ -174,6 +180,37 @@ const paintOnGrid = (e) => {
     window.onmousemove = null;
     window.onmouseup = null;
   };
+};
+
+const drawLine = (x1, y1, x2, y2) => {
+  // y = mx + b;
+  let dx = x2 - x1;
+  let dy = y2 - y1;
+  if (dx === 0) {
+    for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+      grid[x1][y] = currentPaintColor;
+    }
+  } else if (dy === 0) {
+    for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+      grid[x][y1] = currentPaintColor;
+    }
+  } else {
+    let m = dy / dx;
+    let b = (m * x1 - y1) * -1;
+    if (Math.abs(dy) >= Math.abs(dx)) {
+      let calc = (y) => (y - b) / m;
+      for (let y = Math.min(y1, y2); y <= Math.max(y1, y2); y++) {
+        let x = calc(y);
+        grid[Math.round(x)][Math.round(y)] = currentPaintColor;
+      }
+    } else {
+      let calc = (x) => m * x + b;
+      for (let x = Math.min(x1, x2); x <= Math.max(x1, x2); x++) {
+        let y = calc(x);
+        grid[Math.round(x)][Math.round(y)] = currentPaintColor;
+      }
+    }
+  }
 };
 
 // update coordinates of canvas on resize
