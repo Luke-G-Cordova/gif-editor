@@ -8,11 +8,20 @@ let [canvasX, canvasY] = [
 const ctx = canvas.getContext('2d');
 const toolbar = document.querySelector('div.toolbar');
 const toolButtons = document.querySelectorAll('input.toolButton');
+let gridLines = true;
 toolButtons.forEach((tool) => {
   if (tool.type === 'radio') {
     tool.onchange = () => {
       if (tool.checked) {
         setTool(tool.dataset.tn);
+      }
+    };
+  } else if (tool.type === 'checkbox') {
+    tool.onchange = () => {
+      if (tool.checked) {
+        gridLines = false;
+      } else {
+        gridLines = true;
       }
     };
   } else {
@@ -272,7 +281,7 @@ const setTool = (tool) => {
 
 setInterval(() => {
   clearGrid();
-  drawGrid(gridX, gridY, cellSize >= 15);
+  drawGrid(gridX, gridY, cellSize >= 15 && gridLines);
 }, 1);
 
 setTool('paint');

@@ -39,9 +39,6 @@ div.toolWrapper {
   height: 33px;
   position: relative;
 }
-div.toolWrapper > label > input:hover {
-  cursor: pointer;
-}
 div.toolWrapper > label > div {
   width: 33px;
   height: 33px;
@@ -54,6 +51,9 @@ div.toolWrapper > label > div {
   box-sizing: border-box;
 }
 
+div.toolWrapper > label > input:hover {
+  cursor: pointer;
+}
 div.toolWrapper > label > input {
   position: absolute;
   top: 0;
@@ -67,7 +67,8 @@ div.toolWrapper > label > input {
   border: none;
 }
 
-div.toolWrapper > label > input[type='radio'] {
+div.toolWrapper > label > input[type='radio'],
+div.toolWrapper > label > input[type='checkbox'] {
   opacity: 0;
 }
 div.toolWrapper > label > input:checked + div {
