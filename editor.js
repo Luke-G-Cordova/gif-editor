@@ -258,12 +258,12 @@ const snip = (e) => {
   window.onmouseup = (ev) => {
     window.onmousemove = null;
     window.onmouseup = null;
-    if (box.offsetWidth < cellSize || box.offsetHeight < cellSize) {
+    let [matrix, clear, x, y] = [...getMatrix()];
+    if (matrix.every((val) => val.every((val1) => val1 === 0))) {
       box.style.display = 'none';
       box.style.width = '0px';
       box.style.height = '0px';
     } else {
-      let [matrix, clear, x, y] = [...getMatrix()];
       curMatrix.mat = matrix;
       curMatrix.cMat = clear;
       curMatrix.x = x;
@@ -409,6 +409,8 @@ const nullifyUsedEventListeners = () => {
   window.onmousedown = null;
   window.onmousemove = null;
   window.onmouseup = null;
+  let box = document.querySelector('div.snipBox');
+  box.style.display = 'none';
 };
 
 const setTool = (tool) => {

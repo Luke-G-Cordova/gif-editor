@@ -40,6 +40,9 @@ div.snipBox {
   top: 20px;
   left: 20px;
   user-select: none;
+  box-shadow: 2px 2px 4px white, -2px -2px 4px white, -2px 2px 4px white,
+    2px -2px 4px white, inset 2px 2px 4px white, inset -2px -2px 4px white,
+    inset -2px 2px 4px white, inset 2px -2px 4px white;
 }
 div.snipBox:hover {
   cursor: grab;
