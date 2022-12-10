@@ -223,6 +223,7 @@ const moveGrid = (e) => {
 };
 
 const select = (e) => {
+  updateHistory();
   window.onmousedown = null;
   e.path[0].style.cursor = 'grabbing';
   let ogX = e.clientX;
@@ -257,7 +258,6 @@ const select = (e) => {
 };
 
 const snip = (e) => {
-  updateHistory();
   let box = document.querySelector('div.snipBox');
   box.style.display = 'block';
   box.style.width = 0;
