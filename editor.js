@@ -10,6 +10,7 @@ const toolbar = document.querySelector('div.toolbar');
 const toolButtons = document.querySelectorAll('input.toolButton');
 let gridLines = true;
 let showLastFrame = false;
+let frameRate = 1;
 toolButtons.forEach((tool) => {
   if (tool.type === 'radio') {
     tool.onchange = () => {
@@ -44,8 +45,12 @@ toolButtons.forEach((tool) => {
       savePaintColor = tool.value;
       setTool(lastTool);
     };
+  } else if (tool.type === 'number') {
+    tool.onchange = () => {
+      frameRate = tool.value;
+    };
   } else {
-    console.error(`do not handle input type ${tool.type} yet`);
+    console.error(`does not handle input type ${tool.type} yet`);
   }
 });
 ctx.lineWidth = 0.3;
@@ -61,9 +66,10 @@ let currentFrame = 0;
 const history = [];
 let future = [];
 let gridPosX, gridPosY;
-let currentPaintColor = 'black';
-let savePaintColor = 'black';
+let currentPaintColor = '#000000';
+let savePaintColor = '#000000';
 let lastTool = 'paint';
+let PLAY_ANIMATION = null;
 let curMatrix = {
   mat: [],
   cMat: [],
@@ -627,6 +633,23 @@ const setTool = (tool) => {
         currentFrame--;
         setFrame(currentFrame);
       }
+      setTool(lastTool);
+      break;
+    case 'play':
+      if (PLAY_ANIMATION == null) {
+        PLAY_ANIMATION = setInterval(() => {
+          grid = everyFrame[currentFrame];
+          currentFrame++;
+          if (currentFrame >= everyFrame.length) {
+            currentFrame = 0;
+          }
+        }, 1000 / frameRate);
+      }
+      setTool(lastTool);
+      break;
+    case 'pause':
+      clearInterval(PLAY_ANIMATION);
+      PLAY_ANIMATION = null;
       setTool(lastTool);
       break;
     default:
