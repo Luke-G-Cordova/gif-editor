@@ -40,6 +40,8 @@ let amtVisibleSquaresToCenterH = canvas.clientHeight / cellSize / 2;
 let gridX = gridSize / 2;
 let gridY = gridSize / 2;
 let grid = [];
+let everyFrame = [];
+let currentFrame = 0;
 const history = [];
 let future = [];
 let gridPosX, gridPosY;
@@ -59,6 +61,8 @@ for (let i = 0; i < gridSize; i++) {
     grid[i].push(0);
   }
 }
+everyFrame.push(grid);
+const emptyFrame = JSON.parse(JSON.stringify(grid));
 const updateHistory = () => {
   if (future.length > 0) {
     future = [];
@@ -72,12 +76,14 @@ const undo = () => {
   if (history.length > 1) {
     future.push(JSON.stringify(grid));
     grid = JSON.parse(history.pop());
+    everyFrame[currentFrame] = grid;
   }
 };
 const redo = () => {
   if (future.length > 0) {
     history.push(JSON.stringify(grid));
     grid = JSON.parse(future.pop());
+    everyFrame[currentFrame] = grid;
   }
 };
 
@@ -497,6 +503,17 @@ const nullifyUsedEventListeners = () => {
   box.style.display = 'none';
 };
 
+const setFrame = (index) => {
+  if (index < 0 || index > everyFrame.length) {
+    console.error(
+      `No frame exists for index ${index}. There are ${everyFrame.length} frames`
+    );
+  } else {
+    currentFrame = index;
+    grid = everyFrame[currentFrame];
+  }
+};
+
 const setTool = (tool) => {
   switch (tool) {
     case 'move':
@@ -566,6 +583,11 @@ const setTool = (tool) => {
       break;
     case 'redo':
       redo();
+      setTool(lastTool);
+      break;
+    case 'newFrame':
+      grid = JSON.parse(JSON.stringify(emptyFrame));
+      everyFrame.push(grid);
       setTool(lastTool);
       break;
     default:
