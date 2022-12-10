@@ -9,6 +9,7 @@ const ctx = canvas.getContext('2d');
 const toolbar = document.querySelector('div.toolbar');
 const toolButtons = document.querySelectorAll('input.toolButton');
 let gridLines = true;
+let showLastFrame = false;
 toolButtons.forEach((tool) => {
   if (tool.type === 'radio') {
     tool.onchange = () => {
@@ -17,23 +18,34 @@ toolButtons.forEach((tool) => {
       }
     };
   } else if (tool.type === 'checkbox') {
-    tool.onchange = () => {
-      if (tool.checked) {
-        gridLines = false;
-      } else {
-        gridLines = true;
-      }
-    };
+    if (tool.dataset.tn === 'grid_lines') {
+      tool.onchange = () => {
+        if (tool.checked) {
+          gridLines = false;
+        } else {
+          gridLines = true;
+        }
+      };
+    } else {
+      tool.onchange = () => {
+        if (tool.checked) {
+          showLastFrame = true;
+        } else {
+          showLastFrame = false;
+        }
+      };
+    }
   } else if (tool.type === 'button') {
     tool.onclick = () => {
       setTool(tool.dataset.tn);
     };
-  } else {
+  } else if (tool.type === 'color') {
     tool.oninput = () => {
       savePaintColor = tool.value;
       setTool(lastTool);
-      // setTool(tool.value);
     };
+  } else {
+    console.error(`do not handle input type ${tool.type} yet`);
   }
 });
 ctx.lineWidth = 0.3;
@@ -113,6 +125,14 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
         const y = (j - (centerY - amtVisibleSquaresToCenterH)) * cellSize;
         // ctx.fillStyle = grid[i][j] === 0 ? 'black' : 'yellow';
         // ctx.fillRect(x, y, cellSize, cellSize);
+        if (
+          showLastFrame &&
+          currentFrame - 1 >= 0 &&
+          everyFrame[currentFrame - 1][i][j] != 0
+        ) {
+          ctx.fillStyle = everyFrame[currentFrame - 1][i][j] + '88';
+          ctx.fillRect(x, y, cellSize, cellSize);
+        }
         if (grid[i][j] != 0) {
           ctx.fillStyle = grid[i][j];
           ctx.fillRect(x, y, cellSize, cellSize);
@@ -600,12 +620,14 @@ const setTool = (tool) => {
         currentFrame++;
         setFrame(currentFrame);
       }
+      setTool(lastTool);
       break;
     case 'prevFrame':
       if (currentFrame > 0) {
         currentFrame--;
         setFrame(currentFrame);
       }
+      setTool(lastTool);
       break;
     default:
       savePaintColor = tool;
