@@ -129,13 +129,16 @@ const moveGrid = (e) => {
 
 const select = (e) => {
   e.path[0].style.cursor = 'grabbing';
-
+  let ogX = e.clientX;
+  let ogY = e.clientY;
   window.onmousemove = (ev) => {
-    let right = e.path[0].offsetLeft + e.path[0].offsetWidth;
-    let bottom = e.path[0].offsetTop + e.path[0].offsetHeight;
+    let moveX = ev.clientX - ogX;
+    let moveY = ev.clientY - ogY;
 
-    e.path[0].style.top = ev.clientY - (bottom - ev.clientY) + 'px';
-    e.path[0].style.left = ev.clientX - (right - ev.clientX) + 'px';
+    e.path[0].style.top = e.path[0].offsetTop + moveY + 'px';
+    e.path[0].style.left = e.path[0].offsetLeft + moveX + 'px';
+    ogX = ev.clientX;
+    ogY = ev.clientY;
   };
   e.path[0].onmouseup = (ev) => {
     window.onmousemove = null;
