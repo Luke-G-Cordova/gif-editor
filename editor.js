@@ -357,6 +357,47 @@ const drawLine = (x1, y1, x2, y2) => {
   }
 };
 
+const fill = (e) => {
+  let ogX = e.clientX;
+  let ogY = e.clientY;
+  let xOnCanvas = ogX - canvasX;
+  let yOnCanvas = ogY - canvasY;
+  if (
+    xOnCanvas > 0 &&
+    xOnCanvas < canvas.clientWidth &&
+    yOnCanvas > 0 &&
+    yOnCanvas < canvas.clientHeight
+  ) {
+    let x = Math.floor(
+      gridX - amtVisibleSquaresToCenterW + (ogX - canvasX - 1) / cellSize
+    );
+    let y = Math.floor(
+      gridY - amtVisibleSquaresToCenterH + (ogY - canvasY - 1) / cellSize
+    );
+    try {
+      recursiveFill(x, y, grid[x][y]);
+    } catch (e) {
+      console.error('you tried to fill too big of an area');
+    }
+  }
+};
+
+const recursiveFill = (i, j, whatToFill) => {
+  grid[i][j] = currentPaintColor;
+  if (grid[i][j - 1] === whatToFill) {
+    recursiveFill(i, j - 1, whatToFill);
+  }
+  if (grid[i][j + 1] === whatToFill) {
+    recursiveFill(i, j + 1, whatToFill);
+  }
+  if (grid[i - 1][j] === whatToFill) {
+    recursiveFill(i - 1, j, whatToFill);
+  }
+  if (grid[i + 1][j] === whatToFill) {
+    recursiveFill(i + 1, j, whatToFill);
+  }
+};
+
 // update coordinates of canvas on resize
 window.onresize = (e) => {
   const canvasRect = canvas.getBoundingClientRect();
@@ -465,6 +506,10 @@ const setTool = (tool) => {
           window.onmouseup = null;
         };
       };
+      break;
+    case 'fill':
+      nullifyUsedEventListeners();
+      window.onmousedown = fill;
       break;
     default:
       savePaintColor = tool;
