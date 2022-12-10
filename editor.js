@@ -141,7 +141,7 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
         }
         if (grid[i][j] != 0) {
           ctx.fillStyle = grid[i][j];
-          ctx.fillRect(x, y, cellSize, cellSize);
+          ctx.fillRect(x - 1, y - 1, cellSize + 1, cellSize + 1);
         }
         if (gridLines) {
           ctx.beginPath();
