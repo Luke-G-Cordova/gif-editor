@@ -476,6 +476,26 @@ window.onkeydown = (e) => {
     }
   }
 };
+window.addEventListener('copy', (e) => {
+  e.preventDefault();
+  e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
+});
+window.addEventListener('paste', (e) => {
+  e.preventDefault();
+  curMatrix = JSON.parse(e.clipboardData.getData('text/plain'));
+  let keys = Object.keys(curMatrix);
+  if (
+    keys.includes('mat') &&
+    keys.includes('cMat') &&
+    keys.includes('x') &&
+    keys.includes('y')
+  ) {
+    curMatrix.x += 2;
+    curMatrix.y += 2;
+    appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
+    e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
+  }
+});
 
 // update coordinates of canvas on resize
 window.onresize = (e) => {
@@ -651,6 +671,12 @@ const setTool = (tool) => {
       clearInterval(PLAY_ANIMATION);
       PLAY_ANIMATION = null;
       setTool(lastTool);
+      break;
+    case 'copy':
+      if (curMatrix.mat) {
+      }
+      break;
+    case 'paste':
       break;
     default:
       savePaintColor = tool;
