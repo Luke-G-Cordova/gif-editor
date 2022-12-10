@@ -41,6 +41,12 @@ const grid = [];
 let gridPosX, gridPosY;
 let currentPaintColor = 'black';
 let savePaintColor = 'black';
+let curMatrix = {
+  mat: [],
+  cMat: [],
+  x: 0,
+  y: 0,
+};
 
 for (let i = 0; i < gridSize; i++) {
   grid.push([]);
@@ -86,6 +92,60 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
     }
   }
 };
+const clearMatrix = (matrix, x, y) => {
+  x = Math.round(x);
+  y = Math.round(y);
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[0].length; j++) {
+      if (matrix[i][j] != 0) {
+        grid[x + i][y + j] = 0;
+      }
+    }
+  }
+};
+const appendMatrix = (matrix, x, y) => {
+  x = Math.round(x);
+  y = Math.round(y);
+  let clearMatrix = [];
+  for (let i = 0; i < matrix.length; i++) {
+    clearMatrix.push([]);
+    for (let j = 0; j < matrix[0].length; j++) {
+      if (matrix[i][j] != 0) {
+        if (grid[x + i][y + j] != 0) {
+          clearMatrix[i].push(0);
+        } else {
+          clearMatrix[i].push(matrix[i][j]);
+        }
+        grid[x + i][y + j] = matrix[i][j];
+      } else {
+        clearMatrix[i].push(0);
+      }
+    }
+  }
+  return clearMatrix;
+};
+const getMatrix = () => {
+  let box = document.querySelector('div.snipBox');
+  let x = Math.round(
+    box.offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW)
+  );
+  let y = Math.round(
+    box.offsetTop / cellSize + (gridY - amtVisibleSquaresToCenterH)
+  );
+  let w = Math.round(box.offsetWidth / cellSize + x);
+  let h = Math.round(box.offsetHeight / cellSize + y);
+  let matrix = [];
+  let clearMatrix = [];
+  for (let i = x; i < w; i++) {
+    matrix.push([]);
+    clearMatrix.push([]);
+    for (let j = y; j < h; j++) {
+      clearMatrix[clearMatrix.length - 1].push(grid[i][j]);
+      matrix[matrix.length - 1].push(grid[i][j]);
+    }
+  }
+  return [matrix, clearMatrix, x, y];
+};
 
 const moveGrid = (e) => {
   document.body.style.cursor = 'grabbing';
@@ -128,6 +188,7 @@ const moveGrid = (e) => {
 };
 
 const select = (e) => {
+  window.onmousedown = null;
   e.path[0].style.cursor = 'grabbing';
   let ogX = e.clientX;
   let ogY = e.clientY;
@@ -139,11 +200,24 @@ const select = (e) => {
     e.path[0].style.left = e.path[0].offsetLeft + moveX + 'px';
     ogX = ev.clientX;
     ogY = ev.clientY;
+    clearMatrix(curMatrix.cMat, curMatrix.x, curMatrix.y);
+    curMatrix.x =
+      e.path[0].offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW);
+    curMatrix.y =
+      e.path[0].offsetTop / cellSize + (gridY - amtVisibleSquaresToCenterH);
+    curMatrix.cMat = appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
   };
   e.path[0].onmouseup = (ev) => {
+    window.onmousedown = snip;
     window.onmousemove = null;
     e.path[0].onmouseup = null;
     e.path[0].style.cursor = 'grab';
+    clearMatrix(curMatrix.cMat, curMatrix.x, curMatrix.y);
+    curMatrix.x =
+      e.path[0].offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW);
+    curMatrix.y =
+      e.path[0].offsetTop / cellSize + (gridY - amtVisibleSquaresToCenterH);
+    curMatrix.cMat = appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
   };
 };
 
@@ -155,7 +229,7 @@ const snip = (e) => {
 
   box.style.left = e.clientX + 'px';
   box.style.top = e.clientY + 'px';
-
+  box.onmousedown = select;
   let ogX = e.clientX;
   let ogY = e.clientY;
 
@@ -181,10 +255,15 @@ const snip = (e) => {
       box.style.width = '0px';
       box.style.height = '0px';
     } else {
-      setTool('select');
+      let [matrix, clear, x, y] = [...getMatrix()];
+      curMatrix.mat = matrix;
+      curMatrix.cMat = clear;
+      curMatrix.x = x;
+      curMatrix.y = y;
     }
   };
 };
+
 const paintOnGrid = (e) => {
   let ogX = e.clientX;
   let ogY = e.clientY;
@@ -369,18 +448,6 @@ const setTool = (tool) => {
     case 'snip':
       nullifyUsedEventListeners();
       window.onmousedown = snip;
-      toolbar.onmousedown = () => {
-        window.onmousedown = null;
-        window.onmouseup = () => {
-          window.onmousedown = snip;
-          window.onmouseup = null;
-        };
-      };
-      break;
-    case 'select':
-      nullifyUsedEventListeners();
-      let box = document.querySelector('div.snipBox');
-      box.onmousedown = select;
       toolbar.onmousedown = () => {
         window.onmousedown = null;
         window.onmouseup = () => {
