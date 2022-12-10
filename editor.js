@@ -63,8 +63,8 @@ let gridY = gridSize / 2;
 let grid = [];
 let everyFrame = [];
 let currentFrame = 0;
-const history = [];
-let future = [];
+const frameHistory = [];
+const frameFuture = [];
 let gridPosX, gridPosY;
 let currentPaintColor = '#000000';
 let savePaintColor = '#000000';
@@ -84,27 +84,29 @@ for (let i = 0; i < gridSize; i++) {
   }
 }
 everyFrame.push(grid);
+frameHistory.push([]);
+frameFuture.push([]);
 const emptyFrame = JSON.parse(JSON.stringify(grid));
 const updateHistory = () => {
-  if (future.length > 0) {
-    future = [];
+  if (frameFuture[currentFrame].length > 0) {
+    frameFuture[currentFrame] = [];
   }
-  if (history.length < 80) {
-    history.push(JSON.stringify(grid));
+  if (frameHistory[currentFrame].length < 80) {
+    frameHistory[currentFrame].push(JSON.stringify(grid));
   }
 };
 updateHistory();
 const undo = () => {
-  if (history.length > 1) {
-    future.push(JSON.stringify(grid));
-    grid = JSON.parse(history.pop());
+  if (frameHistory[currentFrame].length > 0) {
+    frameFuture[currentFrame].push(JSON.stringify(grid));
+    grid = JSON.parse(frameHistory[currentFrame].pop());
     everyFrame[currentFrame] = grid;
   }
 };
 const redo = () => {
-  if (future.length > 0) {
-    history.push(JSON.stringify(grid));
-    grid = JSON.parse(future.pop());
+  if (frameFuture[currentFrame].length > 0) {
+    frameHistory[currentFrame].push(JSON.stringify(grid));
+    grid = JSON.parse(frameFuture[currentFrame].pop());
     everyFrame[currentFrame] = grid;
   }
 };
@@ -638,6 +640,8 @@ const setTool = (tool) => {
     case 'newFrame':
       grid = JSON.parse(JSON.stringify(emptyFrame));
       everyFrame.push(grid);
+      frameFuture.push([]);
+      frameHistory.push([]);
       setTool(lastTool);
       currentFrame++;
       break;
