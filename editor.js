@@ -92,13 +92,17 @@ const drawGrid = (centerX, centerY, gridLines = false) => {
     }
   }
 };
-const clearMatrix = (matrix, x, y) => {
+const clearMatrix = (matrix, cMat, x, y) => {
   x = Math.round(x);
   y = Math.round(y);
-  for (let i = 0; i < matrix.length; i++) {
-    for (let j = 0; j < matrix[0].length; j++) {
-      if (matrix[i][j] != 0) {
-        grid[x + i][y + j] = 0;
+  for (let i = 0; i < cMat.length; i++) {
+    for (let j = 0; j < cMat[0].length; j++) {
+      if (cMat[i][j] != 0) {
+        if (matrix[i][j] === cMat[i][j]) {
+          grid[x + i][y + j] = 0;
+        } else {
+          grid[x + i][y + j] = cMat[i][j];
+        }
       }
     }
   }
@@ -106,23 +110,27 @@ const clearMatrix = (matrix, x, y) => {
 const appendMatrix = (matrix, x, y) => {
   x = Math.round(x);
   y = Math.round(y);
-  let clearMatrix = [];
+  let cMat = [];
   for (let i = 0; i < matrix.length; i++) {
-    clearMatrix.push([]);
+    cMat.push([]);
     for (let j = 0; j < matrix[0].length; j++) {
       if (matrix[i][j] != 0) {
         if (grid[x + i][y + j] != 0) {
-          clearMatrix[i].push(0);
+          if (grid[x + i][y + j] === matrix[i][j]) {
+            cMat[i].push(0);
+          } else {
+            cMat[i].push(grid[x + i][y + j]);
+          }
         } else {
-          clearMatrix[i].push(matrix[i][j]);
+          cMat[i].push(matrix[i][j]);
         }
         grid[x + i][y + j] = matrix[i][j];
       } else {
-        clearMatrix[i].push(0);
+        cMat[i].push(0);
       }
     }
   }
-  return clearMatrix;
+  return cMat;
 };
 const getMatrix = () => {
   let box = document.querySelector('div.snipBox');
@@ -135,16 +143,16 @@ const getMatrix = () => {
   let w = Math.round(box.offsetWidth / cellSize + x);
   let h = Math.round(box.offsetHeight / cellSize + y);
   let matrix = [];
-  let clearMatrix = [];
+  let cMat = [];
   for (let i = x; i < w; i++) {
     matrix.push([]);
-    clearMatrix.push([]);
+    cMat.push([]);
     for (let j = y; j < h; j++) {
-      clearMatrix[clearMatrix.length - 1].push(grid[i][j]);
+      cMat[cMat.length - 1].push(grid[i][j]);
       matrix[matrix.length - 1].push(grid[i][j]);
     }
   }
-  return [matrix, clearMatrix, x, y];
+  return [matrix, cMat, x, y];
 };
 
 const moveGrid = (e) => {
@@ -200,7 +208,7 @@ const select = (e) => {
     e.path[0].style.left = e.path[0].offsetLeft + moveX + 'px';
     ogX = ev.clientX;
     ogY = ev.clientY;
-    clearMatrix(curMatrix.cMat, curMatrix.x, curMatrix.y);
+    clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
     curMatrix.x =
       e.path[0].offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW);
     curMatrix.y =
@@ -212,7 +220,7 @@ const select = (e) => {
     window.onmousemove = null;
     e.path[0].onmouseup = null;
     e.path[0].style.cursor = 'grab';
-    clearMatrix(curMatrix.cMat, curMatrix.x, curMatrix.y);
+    clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
     curMatrix.x =
       e.path[0].offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW);
     curMatrix.y =
