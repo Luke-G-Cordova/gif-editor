@@ -26,7 +26,9 @@ toolButtons.forEach((tool) => {
     };
   } else {
     tool.oninput = () => {
-      setTool(tool.value);
+      savePaintColor = tool.value;
+      setTool(lastTool);
+      // setTool(tool.value);
     };
   }
 });
@@ -41,6 +43,7 @@ const grid = [];
 let gridPosX, gridPosY;
 let currentPaintColor = 'black';
 let savePaintColor = 'black';
+let lastTool = 'paint';
 let curMatrix = {
   mat: [],
   cMat: [],
@@ -468,6 +471,7 @@ const setTool = (tool) => {
           window.onmouseup = null;
         };
       };
+      lastTool = 'move';
       break;
     case 'paint':
       document.body.style.cursor = 'auto';
@@ -482,6 +486,7 @@ const setTool = (tool) => {
           window.onmouseup = null;
         };
       };
+      lastTool = 'paint';
       break;
     case 'erase':
       document.body.style.cursor = 'auto';
@@ -495,6 +500,7 @@ const setTool = (tool) => {
           window.onmouseup = null;
         };
       };
+      lastTool = 'erase';
       break;
     case 'snip':
       nullifyUsedEventListeners();
@@ -506,10 +512,13 @@ const setTool = (tool) => {
           window.onmouseup = null;
         };
       };
+      lastTool = 'snip';
       break;
     case 'fill':
+      currentPaintColor = savePaintColor;
       nullifyUsedEventListeners();
       window.onmousedown = fill;
+      lastTool = 'fill';
       break;
     default:
       savePaintColor = tool;
