@@ -39,7 +39,9 @@ let amtVisibleSquaresToCenterW = canvas.clientWidth / cellSize / 2;
 let amtVisibleSquaresToCenterH = canvas.clientHeight / cellSize / 2;
 let gridX = gridSize / 2;
 let gridY = gridSize / 2;
-const grid = [];
+let grid = [];
+const history = [];
+let future = [];
 let gridPosX, gridPosY;
 let currentPaintColor = 'black';
 let savePaintColor = 'black';
@@ -57,6 +59,28 @@ for (let i = 0; i < gridSize; i++) {
     grid[i].push(0);
   }
 }
+const updateHistory = () => {
+  if (future.length > 0) {
+    future = [];
+  }
+  if (history.length < 80) {
+    history.push(JSON.stringify(grid));
+  }
+};
+updateHistory();
+const undo = () => {
+  if (history.length > 1) {
+    future.push(JSON.stringify(grid));
+    grid = JSON.parse(history.pop());
+  }
+};
+const redo = () => {
+  if (future.length > 0) {
+    history.push(JSON.stringify(grid));
+    grid = JSON.parse(future.pop());
+  }
+};
+
 const clearGrid = () => {
   ctx.fillStyle = 'white';
   ctx.fillRect(0, 0, canvas.clientWidth, canvas.clientHeight);
@@ -233,6 +257,7 @@ const select = (e) => {
 };
 
 const snip = (e) => {
+  updateHistory();
   let box = document.querySelector('div.snipBox');
   box.style.display = 'block';
   box.style.width = 0;
@@ -276,6 +301,7 @@ const snip = (e) => {
 };
 
 const paintOnGrid = (e) => {
+  updateHistory();
   let ogX = e.clientX;
   let ogY = e.clientY;
   let xOnCanvas = ogX - canvasX;
@@ -361,6 +387,7 @@ const drawLine = (x1, y1, x2, y2) => {
 };
 
 const fill = (e) => {
+  updateHistory();
   let ogX = e.clientX;
   let ogY = e.clientY;
   let xOnCanvas = ogX - canvasX;
@@ -398,6 +425,19 @@ const recursiveFill = (i, j, whatToFill) => {
   }
   if (grid[i + 1][j] === whatToFill) {
     recursiveFill(i + 1, j, whatToFill);
+  }
+};
+
+window.onkeydown = (e) => {
+  if (e.ctrlKey) {
+    switch (e.key) {
+      case 'z':
+        setTool('undo');
+        break;
+      case 'y':
+        setTool('redo');
+        break;
+    }
   }
 };
 
@@ -519,6 +559,14 @@ const setTool = (tool) => {
       nullifyUsedEventListeners();
       window.onmousedown = fill;
       lastTool = 'fill';
+      break;
+    case 'undo':
+      undo();
+      setTool(lastTool);
+      break;
+    case 'redo':
+      redo();
+      setTool(lastTool);
       break;
     default:
       savePaintColor = tool;
