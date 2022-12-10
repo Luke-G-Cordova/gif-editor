@@ -24,6 +24,10 @@ toolButtons.forEach((tool) => {
         gridLines = true;
       }
     };
+  } else if (tool.type === 'button') {
+    tool.onclick = () => {
+      setTool(tool.dataset.tn);
+    };
   } else {
     tool.oninput = () => {
       savePaintColor = tool.value;
@@ -589,6 +593,19 @@ const setTool = (tool) => {
       grid = JSON.parse(JSON.stringify(emptyFrame));
       everyFrame.push(grid);
       setTool(lastTool);
+      currentFrame++;
+      break;
+    case 'nextFrame':
+      if (currentFrame < everyFrame.length - 1) {
+        currentFrame++;
+        setFrame(currentFrame);
+      }
+      break;
+    case 'prevFrame':
+      if (currentFrame > 0) {
+        currentFrame--;
+        setFrame(currentFrame);
+      }
       break;
     default:
       savePaintColor = tool;
