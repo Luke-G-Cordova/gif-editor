@@ -197,6 +197,57 @@ const appendMatrix = (matrix, x, y) => {
   }
   return cMat;
 };
+
+const shrinkFitMatrix = () => {
+  let box = document.querySelector('div.snipBox');
+  let x = Math.round(
+    box.offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW)
+  );
+  let y = Math.round(
+    box.offsetTop / cellSize + (gridY - amtVisibleSquaresToCenterH)
+  );
+  let w = Math.round(box.offsetWidth / cellSize + x);
+  let h = Math.round(box.offsetHeight / cellSize + y);
+  let lx = grid[0].length,
+    ty = grid[0].length,
+    rx = -1,
+    by = -1;
+  for (let i = x; i < w; i++) {
+    for (let j = y; j < h; j++) {
+      if (grid[i][j] != 0) {
+        // find x pos of left most pixel
+        if (i < lx) {
+          lx = i;
+        }
+        // find x pos of right most pixel
+        if (i > rx) {
+          rx = i;
+        }
+        // find y pos of top most pixel
+        if (j < ty) {
+          ty = j;
+        }
+        // find y pos of bottom most pixel
+        if (j > by) {
+          by = j;
+        }
+      }
+    }
+  }
+  let matrix = [];
+  let cMat = [];
+  for (let i = lx; i <= rx; i++) {
+    matrix.push([]);
+    cMat.push([]);
+    for (let j = ty; j <= by; j++) {
+      cMat[cMat.length - 1].push(grid[i][j]);
+      matrix[matrix.length - 1].push(grid[i][j]);
+    }
+  }
+
+  return [matrix, cMat, lx, ty, rx, by];
+};
+
 const getMatrix = () => {
   let box = document.querySelector('div.snipBox');
   let x = Math.round(
@@ -276,9 +327,11 @@ const select = (e) => {
     ogY = ev.clientY;
     clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
     curMatrix.x =
-      e.path[0].offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW);
+      (e.path[0].offsetLeft + 10) / cellSize +
+      (gridX - amtVisibleSquaresToCenterW);
     curMatrix.y =
-      e.path[0].offsetTop / cellSize + (gridY - amtVisibleSquaresToCenterH);
+      (e.path[0].offsetTop + 10) / cellSize +
+      (gridY - amtVisibleSquaresToCenterH);
     curMatrix.cMat = appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
   };
   e.path[0].onmouseup = (ev) => {
@@ -288,9 +341,11 @@ const select = (e) => {
     e.path[0].style.cursor = 'grab';
     clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
     curMatrix.x =
-      e.path[0].offsetLeft / cellSize + (gridX - amtVisibleSquaresToCenterW);
+      (e.path[0].offsetLeft + 10) / cellSize +
+      (gridX - amtVisibleSquaresToCenterW);
     curMatrix.y =
-      e.path[0].offsetTop / cellSize + (gridY - amtVisibleSquaresToCenterH);
+      (e.path[0].offsetTop + 10) / cellSize +
+      (gridY - amtVisibleSquaresToCenterH);
     curMatrix.cMat = appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
   };
 };
@@ -324,12 +379,24 @@ const snip = (e) => {
   window.onmouseup = (ev) => {
     window.onmousemove = null;
     window.onmouseup = null;
-    let [matrix, clear, x, y] = [...getMatrix()];
+    let [matrix, clear, x, y, rx, ry] = [...shrinkFitMatrix()];
     if (matrix.every((val) => val.every((val1) => val1 === 0))) {
       box.style.display = 'none';
       box.style.width = '0px';
       box.style.height = '0px';
     } else {
+      box.style.left =
+        (x - 0.5 - (gridX - amtVisibleSquaresToCenterW)) * cellSize + 'px';
+      box.style.top =
+        (y - 0.5 - (gridY - amtVisibleSquaresToCenterH)) * cellSize + 'px';
+      box.style.width =
+        (rx + 2 - (gridX - amtVisibleSquaresToCenterW)) * cellSize -
+        (x - (gridX - amtVisibleSquaresToCenterW)) * cellSize +
+        'px';
+      box.style.height =
+        (ry + 2 - (gridY - amtVisibleSquaresToCenterH)) * cellSize -
+        (y - (gridY - amtVisibleSquaresToCenterH)) * cellSize +
+        'px';
       curMatrix.mat = matrix;
       curMatrix.cMat = clear;
       curMatrix.x = x;
