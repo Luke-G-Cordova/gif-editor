@@ -561,11 +561,43 @@ window.addEventListener('paste', (e) => {
   ) {
     curMatrix.x += 2;
     curMatrix.y += 2;
-    appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
+    let box = document.querySelector('div.snipBox');
+    box.style.display = 'block';
+    box.style.left =
+      (curMatrix.x - 0.5 - (gridX - amtVisibleSquaresToCenterW)) * cellSize +
+      'px';
+    box.style.top =
+      (curMatrix.y - 0.5 - (gridY - amtVisibleSquaresToCenterH)) * cellSize +
+      'px';
+    box.style.width =
+      (curMatrix.x +
+        curMatrix.mat.length +
+        1 -
+        (gridX - amtVisibleSquaresToCenterW)) *
+        cellSize -
+      (curMatrix.x - (gridX - amtVisibleSquaresToCenterW)) * cellSize +
+      'px';
+    box.style.height =
+      (curMatrix.y +
+        curMatrix.mat[0].length +
+        1 -
+        (gridY - amtVisibleSquaresToCenterH)) *
+        cellSize -
+      (curMatrix.y - (gridY - amtVisibleSquaresToCenterH)) * cellSize +
+      'px';
+    curMatrix.cMat = appendMatrix(curMatrix.mat, curMatrix.x, curMatrix.y);
     e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
   }
 });
-
+window.addEventListener('cut', (e) => {
+  e.preventDefault();
+  let box = document.querySelector('div.snipBox');
+  if (box.style.display != 'none') {
+    e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
+    clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
+    box.style.display = 'none';
+  }
+});
 // update coordinates of canvas on resize
 window.onresize = (e) => {
   const canvasRect = canvas.getBoundingClientRect();
