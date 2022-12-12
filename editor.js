@@ -10,7 +10,7 @@ const toolbar = document.querySelector('div.toolbar');
 const toolButtons = document.querySelectorAll('input.toolButton');
 let gridLines = true;
 let showLastFrame = false;
-let frameRate = 1;
+let frameRate = 8;
 toolButtons.forEach((tool) => {
   if (tool.type === 'radio') {
     tool.onchange = () => {
