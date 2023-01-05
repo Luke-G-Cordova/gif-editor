@@ -2,10 +2,9 @@
   "name": "gifeditor",
   "version": "1.0.0",
   "description": "allows the editing and creation of simple gifs",
-  "main": "index.js",
-  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node -r dotenv/config ./server.mjs",
+    "dev": "nodemon -r dotenv/config ./server.mjs"
   },
   "repository": {
     "type": "git",
@@ -20,7 +19,14 @@
   "homepage": "https://github.com/Luke-G-Cordova/gif-editor#readme",
   "dependencies": {
     "canvas": "^2.10.2",
+    "dotenv": "^16.0.3",
+    "ejs": "^3.1.8",
+    "express": "^4.18.2",
     "gif-encoder-2": "^1.0.5",
+    "path": "^0.12.7",
     "stream": "^0.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
   }
 }
