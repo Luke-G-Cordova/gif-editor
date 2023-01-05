@@ -545,10 +545,22 @@ window.onkeydown = (e) => {
     }
   }
 };
+
 window.addEventListener('copy', (e) => {
   e.preventDefault();
   e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
 });
+
+window.addEventListener('cut', (e) => {
+  e.preventDefault();
+  let box = document.querySelector('div.snipBox');
+  if (box.style.display != 'none') {
+    e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
+    clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
+    box.style.display = 'none';
+  }
+});
+
 window.addEventListener('paste', (e) => {
   e.preventDefault();
   curMatrix = JSON.parse(e.clipboardData.getData('text/plain'));
@@ -589,15 +601,7 @@ window.addEventListener('paste', (e) => {
     e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
   }
 });
-window.addEventListener('cut', (e) => {
-  e.preventDefault();
-  let box = document.querySelector('div.snipBox');
-  if (box.style.display != 'none') {
-    e.clipboardData.setData('text/plain', JSON.stringify(curMatrix));
-    clearMatrix(curMatrix.mat, curMatrix.cMat, curMatrix.x, curMatrix.y);
-    box.style.display = 'none';
-  }
-});
+
 // update coordinates of canvas on resize
 window.onresize = (e) => {
   const canvasRect = canvas.getBoundingClientRect();
@@ -774,12 +778,6 @@ const setTool = (tool) => {
       clearInterval(PLAY_ANIMATION);
       PLAY_ANIMATION = null;
       setTool(lastTool);
-      break;
-    case 'copy':
-      if (curMatrix.mat) {
-      }
-      break;
-    case 'paste':
       break;
     default:
       savePaintColor = tool;
