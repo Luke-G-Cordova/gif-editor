@@ -779,6 +779,20 @@ const setTool = (tool) => {
       PLAY_ANIMATION = null;
       setTool(lastTool);
       break;
+    case 'download':
+      clearInterval(PLAY_ANIMATION);
+      PLAY_ANIMATION = null;
+      fetch(
+        `/create-gif?width=500&height=500&reproduceSteps=${JSON.stringify(
+          everyFrame
+        )}`,
+        {
+          method: 'POST',
+        }
+      ).then((res) => {
+        console.log(res);
+      });
+      setTool(lastTool);
     default:
       savePaintColor = tool;
       setTool('paint');
