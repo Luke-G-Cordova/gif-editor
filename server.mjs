@@ -15,11 +15,9 @@ app.get('/', (req, res) => {
 });
 
 app.post('/create-gif', (req, res) => {
-  const reproduceSteps = req.params.reproduceSteps;
-  const width = req.params.width;
-  const height = req.params.height;
   res.readyState = 4;
   res.status = 200;
+  res.send(JSON.stringify(req.body.frames));
   // const createdGif = GIF.makeGIF(width, height, reproduceSteps);
   // res.sendFile(createdGif);
 });

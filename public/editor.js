@@ -54,7 +54,7 @@ toolButtons.forEach((tool) => {
   }
 });
 ctx.lineWidth = 0.3;
-let gridSize = 1000;
+let gridSize = 100;
 let cellSize = 15;
 let amtVisibleSquaresToCenterW = canvas.clientWidth / cellSize / 2;
 let amtVisibleSquaresToCenterH = canvas.clientHeight / cellSize / 2;
@@ -782,14 +782,18 @@ const setTool = (tool) => {
     case 'download':
       clearInterval(PLAY_ANIMATION);
       PLAY_ANIMATION = null;
-      fetch(
-        `/create-gif?width=500&height=500&reproduceSteps=${JSON.stringify(
-          everyFrame
-        )}`,
-        {
-          method: 'POST',
-        }
-      ).then((res) => {
+      let body = {
+        width: 500,
+        height: 500,
+        frames: everyFrame,
+      };
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      fetch(`/create-gif`, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify(body),
+      }).then((res) => {
         console.log(res);
       });
       setTool(lastTool);
